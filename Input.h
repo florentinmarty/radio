@@ -1,7 +1,12 @@
+#ifndef INPUT_H
+#define INPUT_H
+
 #include "Arduino.h"
 #include "SoftwareSerial.h"
-#define PRESSED 0
-#define RELEASED 1
+#include <ezButton.h>
+const int SHORT_PRESS_TIME = 500; // 500 milliseconds
+const int LONG_PRESS_TIME = 500; // 500 milliseconds
+
 
 class Input{
   public: 
@@ -10,14 +15,18 @@ class Input{
       void updateState();
       bool getRisingEdge();
       bool getFallingEdge();
-      bool isPressed();
+      bool isShortPressed();
+      bool isLongPressed();
   private:
-      int _pin;
-      int _oldState = RELEASED;
-      int _state = RELEASED;
-      int _justReleased = false;
-      int _justPressedDown = false;
-      long _pressed_time = 0;
-      long _released_time = 0;
-      bool _longPress = false;
+      ezButton button = NULL;
+      bool _isPressing = false;
+      bool _justPressedDown = false;
+      bool _justReleased = false;
+
+      long _pressedTime = 0;
+      long _releasedTime = 0;
+      bool _shortPressDetected = false;
+      bool _isLongDetected = false;
 };
+
+#endif

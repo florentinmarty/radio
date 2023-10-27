@@ -1,45 +1,44 @@
 #include "Input.h"
 
-
 Input::Input() {}
 
 Input::Input(int pinToSet) {
-  _pin = pinToSet;
-  pinMode(_pin, INPUT);
-  digitalWrite(_pin, HIGH);
+  ezButton tempButton(pinToSet);
+  button = tempButton;
+  button.setDebounceTime(50);
+  //pinMode(_pin, INPUT);
+  //digitalWrite(_pin, HIGH);
 
 }
 
 void Input::updateState() {
-  _oldState = _state;
-  _state = digitalRead(_pin);
-  char buf [64];
+  button.loop();
+  _shortPressDetected = false;
+  _justPressedDown = button.isPressed();
+  _justReleased = button.isReleased();
 
-  if (_state == PRESSED & _oldState == RELEASED) {
-    _justPressedDown = true;
-    _pressed_time = millis();
-  } else
+
+  if (_justPressedDown) {
+    _pressedTime = millis();
+    _isPressing = true;
+    _isLongDetected = false;
+  } else if(_justReleased)
   {
-    _justPressedDown = false;
+    _isPressing = false;
+    _releasedTime = millis();
+
+    long pressDuration = _releasedTime - _pressedTime;
+    if (pressDuration < SHORT_PRESS_TIME){
+      _shortPressDetected = true;
+    }
   }
 
-  if (_state == RELEASED & _oldState == PRESSED &!_longPress) {
-    _justReleased = true;
-    _released_time = millis();
-  } else
-  {
-    _longPress = false;
-    _justReleased = false;
+  if(_isPressing && !_isLongDetected){
+    long pressDuration = millis() - _pressedTime;
+    if( pressDuration > LONG_PRESS_TIME ) {
+        _isLongDetected = true;
+      }
   }
-
-  if (_state == PRESSED) {
-    _longPress = millis() -_pressed_time > 500;
-    Serial.println(millis() -_pressed_time );
-  } else{
-    _longPress = false;
-    _pressed_time = millis();
-  } 
-
 }
 
 bool Input::getFallingEdge() {
@@ -50,7 +49,11 @@ bool Input::getRisingEdge() {
   return _justReleased;
 }
 
-bool Input::isPressed() {
-  return _longPress;  
+bool Input::isShortPressed() {
+  return _shortPressDetected;  
+
+}
+bool Input::isLongPressed() {
+  return _isLongDetected;  
 
 }

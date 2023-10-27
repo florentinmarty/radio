@@ -36,7 +36,7 @@ void PersistanceState::setFolder(int folder){
   
       Serial.println("Set Folder to ");Serial.println(folder );
       EEPROM.update(FOLDER_ADRESS, folder);
-      delay(100);
+      //delay(100);
       Serial.println("___________________\n" );
     }
 }

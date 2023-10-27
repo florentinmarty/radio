@@ -1,3 +1,6 @@
+#ifndef PERSISTANCE_STATE_H
+#define PERSISTANCE_STATE_H
+
 #include "Arduino.h"
 #include "SoftwareSerial.h"
 #include <Vector.h>
@@ -36,3 +39,5 @@ class PersistanceState{
       int _volume;
       int* _folderAndTrackCount;
 };
+
+#endif
